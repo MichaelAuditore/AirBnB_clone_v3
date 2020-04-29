@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" Cities template """
+""" Reviews template """
 from flask import request, jsonify, abort
 from api.v1.views import app_views
 from models import storage, place, review, user
@@ -13,8 +13,8 @@ def get_reviews(place_id):
     if s_place is None:
         abort(404)
     print(s_place)
-    cities = [c.to_dict() for c in s_place.reviews]
-    return (jsonify(cities), 200)
+    reviews = [c.to_dict() for c in s_place.reviews]
+    return (jsonify(reviews), 200)
 
 
 @app_views.route('/reviews/<review_id>', methods=['GET'],
@@ -53,16 +53,16 @@ def post_review(place_id):
         abort(400, 'Missing user_id')
     if 'text' not in content:
         abort(400, 'Missing text')
-    one_state = storage.get(state.State, state_id)
-    if one_state is None:
+    one_place = storage.get(place.Place, place_id)
+    if one_place is None:
         abort(404)
     one_user = storage.get(user.User, content['user_id'])
     if one_user is None:
         abort(404)
     new_review = review.Review()
-    new_city.text = content['text']
-    new_city.user_id = content['user_id']
-    new_city.place_id = place_id
+    new_review.text = content['text']
+    new_review.user_id = content['user_id']
+    new_review.place_id = place_id
     storage.new(new_review)
     storage.save()
     return(jsonify(new_review.to_dict()), 201)
