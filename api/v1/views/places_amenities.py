@@ -5,13 +5,16 @@ from api.v1.views import app_views
 from models import storage, place, amenity
 from os import environ
 
+
 @app_views.route('/places/<place_id>/amenities', methods=['GET'],
                  strict_slashes=False)
 def get_amenities_by_place(place_id):
     """ Return all amenities linked to a place """
+
     s_place = storage.get(place.Place, place_id)
     if s_place is None:
         abort(404)
+
     if (environ.get('HBNB_TYPE_STORAGE') == 'db'):
         amenities = [a.to_dict() for a in s_place.amenities]
     else:
@@ -56,6 +59,7 @@ def post_amenity_place(place_id, amenity_id):
 
     if not s_place:
         abort(404)
+
     if not s_amenity:
         abort(404)
 
@@ -65,7 +69,7 @@ def post_amenity_place(place_id, amenity_id):
         else:
             place.amenities.append(s_amenity)
     else:
-        if s_amenity in s_place.amenity_ids:
+        if amenity_id in s_place.amenity_ids:
             return (jsonify(s_amenity.to_dict()), 200)
         else:
             place.amenity_ids.append(amenity_id)
