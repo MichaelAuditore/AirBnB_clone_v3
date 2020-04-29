@@ -42,7 +42,7 @@ def post_user():
     if 'email' not in content:
         abort(400, 'Missing email')
     if 'password' not in content:
-        abort(400, 'Missing pasword')
+        abort(400, 'Missing password')
     new_user = user.User()
     new_user.email = content['email']
     new_user.password = content['password']
