@@ -89,6 +89,6 @@ def put_place(place_id):
 
     for key, val in content.items():
         if key not in ignore:
-            setattr(one_place, key, value)
+            setattr(one_place, key, val)
     storage.save()
     return(jsonify(one_place.to_dict()), 200)
