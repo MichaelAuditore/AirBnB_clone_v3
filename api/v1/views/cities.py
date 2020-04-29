@@ -9,27 +9,22 @@ from models import storage, city, state
                  strict_slashes=False)
 def get_cities(state_id):
     """ Return all cities linked to a state """
-    cities = storage.all(city.City).values()
-    filter_cities = []
-    if state_id is not None:
-        list_cities = [c.to_dict() for c in cities]
-        for one_city in list_cities:
-            if one_city['state_id'] == state_id:
-                filter_cities.append(one_city)
-    if len(filter_cities) != 0:
-        return (jsonify(filter_cities))
-    else:
+    s_state = storage.get(state.State, state_id)
+    if s_state is None:
         abort(404)
-
+    cities = [c.to_dict() for c in s_state.cities]
+    return (jsonify(cities), 200)
 
 @app_views.route('/cities/<city_id>', methods=['GET'],
                  strict_slashes=False)
 def get_city(city_id):
     """ Return a City that matches with the given ID """
-    one_city = storage.get(city.City, city_id)
-    if not one_city:
-        abort(404)
-    return (jsonify(one_city.to_dict()))
+    cities = storage.all(city.City).values()
+    list_cities = [c.to_dict() for c in cities]
+    for one_city in list_cities:
+        if one_city['id'] == city_id:
+            return (jsonify(one_city))
+    abort(404)
 
 @app_views.route('/cities/<city_id>', methods=['DELETE'],
                  strict_slashes=False)
