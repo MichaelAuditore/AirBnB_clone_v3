@@ -2,7 +2,7 @@
 """ Places template """
 from flask import request, jsonify, abort
 from api.v1.views import app_views
-from models import storage, city, place, user
+from models import storage, city, place, user, amenity
 
 
 @app_views.route('/cities/<city_id>/places', methods=['GET'],
@@ -92,3 +92,59 @@ def put_place(place_id):
             setattr(one_place, key, val)
     storage.save()
     return(jsonify(one_place.to_dict()), 200)
+
+
+@app_views.route('v1/places_search', method=['POST'])
+def places_by_objects():
+    """Get all place Objects depending JSON body of the request"""
+
+    content = request.get_json()
+
+    if not content.is_json:
+        abort(404, "Not a JSON")
+
+    if (content['states'] is None and
+        content['cities'] is None and
+        content['amenities'] is None):
+        places = storage.all(place.Place).values()
+        list_places = [p.to_dict() for p in places]
+        return (jsonify(list_places))
+
+    list_places = []
+    if content.get('states'):
+        obj = [storage.get(state.State, state_id)
+               for state_id in content.get('states')]
+        for st in obj:
+            if st:
+                for ct in st.cities:
+                    if ct:
+                        for pl in ct.places:
+                            list_places.append(pl)
+
+    if content.get('cities'):
+        obj = [storage.get(city.City, city_id)
+               for city_id in content.get('cities')]
+        for ct in obj:
+            if ct:
+                for pl in ct.places:
+                    if pl not in list_places:
+                        list_places.append(pl)
+
+    if content.get('amenities'):
+        if not list_places:
+            list_places = storage.all(place.Place).values()
+        obj = [storage.get(amenity.Amenity, a)
+               for a in content.get('amenities')]
+        all_places = []
+        for p in list_places:
+            for a in obj:
+                if (a in p.amenities):
+                    all_places.append(a)
+
+    final_list = []
+    for p in all_places:
+        d = p.to_dict()
+        d.pop('amenities', None)
+        final_list.append(d)
+
+    return (jsonify(final_list))
