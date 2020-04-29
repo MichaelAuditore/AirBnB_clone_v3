@@ -6,7 +6,7 @@ from models import storage, place, amenity
 from os import environ
 
 
-@app_views.route('/places/<place_id>/amenities', methods=['GET'],
+@app_views.route('places/<place_id>/amenities', methods=['GET'],
                  strict_slashes=False)
 def get_amenities_by_place(place_id):
     """ Return all amenities linked to a place """
@@ -40,7 +40,7 @@ def delete_amenity_place(place_id, amenity_id):
     if (environ.get('HBNB_TYPE_STORAGE') == 'db'):
         if s_amenity not in s_place.amenities:
             abort(404)
-        s_place.amenities.remove(amenity_id)
+        s_place.amenities.remove(s_amenity)
     else:
         if amenity_id not in s_place.amenity_ids:
             abort(404)
