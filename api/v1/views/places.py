@@ -103,9 +103,11 @@ def places_by_objects():
     if not content.is_json:
         abort(404, "Not a JSON")
 
-    if (content['states'] is None and
-        content['cities'] is None and
-        content['amenities'] is None):
+        states = content['states']
+        cities = content['cities']
+        amenities = content['amenities']
+
+    if (not states and not cities and not amenities):
         places = storage.all(place.Place).values()
         list_places = [p.to_dict() for p in places]
         return (jsonify(list_places))
