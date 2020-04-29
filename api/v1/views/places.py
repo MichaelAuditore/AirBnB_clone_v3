@@ -99,61 +99,38 @@ def search_places():
     """return a list of places per state, city or amenity id
     do filters for each key into JSON passed to check
     """
-    # JSON request is Empty or doesn't JSON
-    content = request.get_json()
-    if content is None:
-        return jsonify('Not a JSON'), 400
-    # Check JSON to know if empty or not if it's empty return all objects
-    result, places = [], []
-    if len(content) == 0:
-        places = storage.all("Place").values()
-        for elem in places:
-            result.append(elem.to_dict())
-        return jsonify(result)
-
-    flag = 0
-    for key in content:
-        if len(content[key]) > 0:
-            flag = 1
-            break
-    if flag == 0:
-        places = storage.all("Place").values()
-        for elem in places:
-            result.append(elem.to_dict())
-        return jsonify(result)
-    # Check each Key, to get objects by state
-    if "states" in content.keys() and len(content["states"]) > 0:
-        states = content["states"]
-        for id in states:
-            st = storage.get("State", id)
-            if st:
-                for city in st.cities:
-                    for pl in city.places:
-                        places.append(pl)
-    # Check each Key, to get objects by city excluding objects already are into
-    if "cities" in content.keys() and len(content["cities"]) > 0:
-        cities = content["cities"]
-        for id in cities:
-            ct = storage.get("City", id)
-            if ct:
-                for pl in ct.places:
-                    places.append(pl)
-
-    # Generate a list of unique values
-    places = list(set(places))
-
-    # Check amenities key, do a filter to add into final Place's object List
-    if "amenities" in content.keys() and len(content["amenities"]) > 0:
-        ame = []
-        for id in content["amenities"]:
-            ame.append(storage.get("Amenity", id))
-        places = [pl for pl in places if all([a in pl.amenities for a in ame])]
-
-    # Remove duplicate amenities
-    for elem in places:
-        var = elem.to_dict()
-        if "amenities" in var.keys():
-            del var["amenities"]
-        result.append(var)
-
-    return jsonify(result)
+    if request.get_json() is not None:
+        content = request.get_json()
+        states = content.get('states', [])
+        cities = content.get('cities', [])
+        amenities = content.get('amenities', [])
+        amenity_objects = []
+        for amenity_id in amenities:
+            amenity = storage.get('Amenity', amenity_id)
+            if amenity:
+                amenity_objects.append(amenity)
+        if states == cities == []:
+            places = storage.all('Place').values()
+        else:
+            places = []
+            for state_id in states:
+                state = storage.get('State', state_id)
+                state_cities = state.cities
+                for city in state_cities:
+                    if city.id not in cities:
+                        cities.append(city.id)
+            for city_id in cities:
+                city = storage.get('City', city_id)
+                for place in city.places:
+                    places.append(place)
+        last_places = []
+        for place in places:
+            place_amenities = place.amenities
+            last_places.append(place.to_dict())
+            for amenity in amenity_objects:
+                if amenity not in place_amenities:
+                    last_places.pop()
+                    break
+        return jsonify(last_places)
+    else:
+        return make_response(jsonify({'error': 'Not a JSON'}), 400)
