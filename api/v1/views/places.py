@@ -12,7 +12,7 @@ def get_places(city_id):
     s_city = storage.get(city.City, city_id)
     if s_city is None:
         abort(404)
-    places = [c.to_dict() for c in s_city.places]
+    places = [p.to_dict() for p in s_city.places]
     return (jsonify(places), 200)
 
 
@@ -20,10 +20,12 @@ def get_places(city_id):
                  strict_slashes=False)
 def get_place(place_id):
     """ Return a place that matches with the given ID """
-    g_place = storage.get(place.Place, place_id)
-    if not (g_place):
-        abort(404)
-    return (jsonify(g_place.to_dict()), 200)
+    places = storage.all(place.Place).values()
+    list_places = [p.to_dict() for p in places]
+    for one_place in list_places:
+        if one_place['id'] == place_id:
+            return (jsonify(one_city))
+    abort(404)
 
 
 @app_views.route('/places/<place_id>', methods=['DELETE'],
