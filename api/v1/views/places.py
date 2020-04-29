@@ -10,7 +10,7 @@ from models import storage, city, place, user
 def get_places(city_id):
     """ Return all places linked to a city """
     s_city = storage.get(city.City, city_id)
-    if s_city is None:
+    if not s_city:
         abort(404)
     places = [p.to_dict() for p in s_city.places]
     return (jsonify(places), 200)
@@ -57,16 +57,16 @@ def post_place(city_id):
     if 'user_id' not in content:
         abort(400, "Missing user_id")
 
-    if 'name' not in content:
-        abort(400, "Missing name")
-
     s_user = storage.get(user.User, data['user_id'])
 
     if not s_user:
         abort(404)
 
+    if 'name' not in content:
+        abort(400, "Missing name")
+
+    content['city_id'] = city_id
     new_place = place.Place(**content)
-    new_place.city_id = city_id
     new_place.save()
     return(jsonify(new_place.to_dict()), 201)
 
@@ -76,10 +76,13 @@ def post_place(city_id):
 def put_place(place_id):
     """ Update information in a place if ID exists """
     one_place = storage.get(place.Place, place_id)
-    if one_place is None:
+
+    if not one_place:
         abort(404)
+
     content = request.get_json()
-    if content is None:
+
+    if not content:
         abort(400, 'Not a JSON')
 
     ignore = ['id', 'created_at', 'updated_at', 'city_id', 'user_id']
