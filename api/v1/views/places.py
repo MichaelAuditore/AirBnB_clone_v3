@@ -57,7 +57,7 @@ def post_place(city_id):
     if 'user_id' not in content:
         abort(400, "Missing user_id")
 
-    s_user = storage.get(user.User, data['user_id'])
+    s_user = storage.get(user.User, content['user_id'])
 
     if not s_user:
         abort(404)
