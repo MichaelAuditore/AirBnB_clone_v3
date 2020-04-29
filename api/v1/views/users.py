@@ -68,5 +68,7 @@ def put_user(user_id):
         setattr(one_user, 'first_name', content['first_name'])
     if 'last_name' in content:
         setattr(one_user, 'last_name', content['last_name'])
+    if 'password' in content:
+        setattr(one_user, 'password', content['password'])
     storage.save()
     return(jsonify(one_user.to_dict()), 200)
