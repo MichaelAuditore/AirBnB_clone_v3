@@ -12,7 +12,7 @@ from models.amenity import Amenity
 def show_amenities(amenity_id=None):
     """return All amenity objects or a specific amenity object by id"""
     if not amenity_id:
-        all_amenities = storage.all(Amenity)
+        all_amenities = storage.all(Amenity).values()
         list_amenities = [amenity.to_dict() for amenity in all_amenities]
         return jsonify(list_amenities)
     else:
@@ -57,7 +57,7 @@ def update_amenity(amenity_id):
     content = request.get_json()
     if content is None:
         abort(400, 'Not a JSON')
-        amenity = storage.get(Amenity, amenity_id)
+    amenity = storage.get(Amenity, amenity_id)
     if amenity is None:
         abort(404)
     for key, val in content.items():
