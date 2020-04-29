@@ -47,13 +47,7 @@ def post_user():
         abort(400, 'Migssing email')
     if 'password' not in content:
         abort(400, 'Missing password')
-    new_user = user.User()
-    new_user.email = content['email']
-    new_user.password = content['password']
-    if 'first_name' in content:
-        new_user.first_name = content['first_name']
-    if 'last_name' in content:
-        new_user.last_name = content['last_name']
+    new_user = user.User(**content)
     storage.new(new_user)
     storage.save()
     return (jsonify(new_user.to_dict()), 201)
