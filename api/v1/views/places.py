@@ -20,12 +20,11 @@ def get_places(city_id):
                  strict_slashes=False)
 def get_place(place_id):
     """ Return a place that matches with the given ID """
-    places = storage.all(place.Place).values()
-    list_places = [p.to_dict() for p in places]
-    for one_place in list_places:
-        if one_place['id'] == place_id:
-            return (jsonify(one_city))
-    abort(404)
+    places = storage.get(place.Place, place_id)
+    if places:
+        return (jsonify(places.to_dict()), 200)
+    else:
+        abort(404)
 
 
 @app_views.route('/places/<place_id>', methods=['DELETE'],
@@ -36,7 +35,7 @@ def delete_place(place_id):
     if d_place:
         storage.delete(d_place)
         storage.save()
-        return (jsonify({}))
+        return (jsonify({}), 200)
     else:
         abort(404)
 
@@ -45,23 +44,30 @@ def delete_place(place_id):
                  strict_slashes=False)
 def post_place(city_id):
     """ Add a new place based in city_id """
-    content = request.get_json()
-    if content is None:
-        abort(400, 'Not a JSON')
-    if 'name' not in content:
-        abort(400, 'Missing name')
-    if 'user_id' not in content:
-        abort(400, 'Missing user_id')
 
-    one_city = storage.get(city.City, city_id)
-    one_user = storage.get(user.User, content['user_id'])
-    if one_city is None or one_user is None:
+    s_city = storage.get(city.City, city_id)
+    content = request.get_json()
+
+    if not s_city:
+        abort(404)
+
+    if not content:
+        abort(400, "Not a JSON")
+
+    if 'user_id' not in content:
+        abort(400, "Missing user_id")
+
+    if 'name' not in content:
+        abort(400, "Missing name")
+
+    s_user = storage.get(user.User, data['user_id'])
+
+    if not s_user:
         abort(404)
 
     new_place = place.Place(**content)
     new_place.city_id = city_id
-    storage.new(new_place)
-    storage.save()
+    new_place.save()
     return(jsonify(new_place.to_dict()), 201)
 
 
@@ -79,8 +85,7 @@ def put_place(place_id):
     ignore = ['id', 'created_at', 'updated_at', 'city_id', 'user_id']
 
     for key, val in content.items():
-        for item in ignore:
-            if (key != item):
-                setattr(one_place, key, value)
+        if key not in ignore:
+            setattr(one_place, key, value)
     storage.save()
     return(jsonify(one_place.to_dict()), 200)
