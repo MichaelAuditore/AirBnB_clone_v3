@@ -22,8 +22,8 @@ def get_cities(state_id):
         abort(404)
 
 
-@app_views.route('/cities/<city_id>', methods=['GET']
-                 , strict_slashes=False)
+@app_views.route('/cities/<city_id>', methods=['GET'],
+                 strict_slashes=False)
 def get_city(city_id):
     """ Return a City that matches with the given ID """
     cities = storage.all(city.City).values()
@@ -34,8 +34,8 @@ def get_city(city_id):
     abort(404)
 
 
-@app_views.route('/cities/<city_id>', methods=['DELETE']
-                 , strict_slashes=False)
+@app_views.route('/cities/<city_id>', methods=['DELETE'],
+                 strict_slashes=False)
 def delete_city(city_id):
     """ Delete a city with the given ID """
     cities = storage.all(city.City).values()
@@ -47,8 +47,8 @@ def delete_city(city_id):
     abort(404)
 
 
-@app_views.route("/states/<state_id>/cities", methods=['POST']
-                 , strict_slashes=False)
+@app_views.route("/states/<state_id>/cities", methods=['POST'],
+                 strict_slashes=False)
 def post_city(state_id):
     """ Add a new city based in state_id """
     content = request.get_json()
@@ -64,11 +64,11 @@ def post_city(state_id):
     new_city.state_id = state_id
     storage.new(new_city)
     storage.save()
-    return(new_city.to_dict(), 201)
+    return(jsonify(new_city.to_dict()), 201)
 
 
-@app_views.route("/cities/<city_id>", methods=['PUT']
-                 , strict_slashes=False)
+@app_views.route("/cities/<city_id>", methods=['PUT'],
+                 strict_slashes=False)
 def put_city(city_id):
     """ Update information in a city if ID exists """
     content = request.get_json()
