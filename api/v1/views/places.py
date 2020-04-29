@@ -125,7 +125,7 @@ def search_places():
     if "states" in content.keys() and len(content["states"]) > 0:
         states = content["states"]
         for id in states:
-            st = storage.get(state.State, id)
+            st = storage.get("State", id)
             if st:
                 for city in st.cities:
                     for pl in city.places:
@@ -134,7 +134,7 @@ def search_places():
     if "cities" in content.keys() and len(content["cities"]) > 0:
         cities = content["cities"]
         for id in cities:
-            ct = storage.get(city.City, id)
+            ct = storage.get("City", id)
             if ct:
                 for pl in ct.places:
                     places.append(pl)
@@ -146,7 +146,7 @@ def search_places():
     if "amenities" in content.keys() and len(content["amenities"]) > 0:
         ame = []
         for id in content["amenities"]:
-            ame.append(storage.get(amenity.Amenity, id))
+            ame.append(storage.get("Amenity", id))
         places = [pl for pl in places if all([a in pl.amenities for a in ame])]
 
     # Remove duplicate amenities
