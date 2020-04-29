@@ -106,7 +106,7 @@ def search_places():
     # Check JSON to know if empty or not if it's empty return all objects
     result, places = [], []
     if len(content) == 0:
-        places = storage.all(place.Place).values()
+        places = storage.all("Place").values()
         for elem in places:
             result.append(elem.to_dict())
         return jsonify(result)
@@ -117,7 +117,7 @@ def search_places():
             flag = 1
             break
     if flag == 0:
-        places = storage.all(place.Place).values()
+        places = storage.all("Place").values()
         for elem in places:
             result.append(elem.to_dict())
         return jsonify(result)
