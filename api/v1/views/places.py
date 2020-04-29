@@ -93,6 +93,7 @@ def put_place(place_id):
     storage.save()
     return(jsonify(one_place.to_dict()), 200)
 
+
 @app_views.route('/places_search', methods=['POST'])
 def search_places():
     """return a list of places per state, city or amenity id
@@ -124,7 +125,7 @@ def search_places():
     if "states" in content.keys() and len(content["states"]) > 0:
         states = content["states"]
         for id in states:
-            st = storage.get("State", id)
+            st = storage.get(state.State, id)
             if st:
                 for city in st.cities:
                     for pl in city.places:
@@ -133,18 +134,19 @@ def search_places():
     if "cities" in content.keys() and len(content["cities"]) > 0:
         cities = content["cities"]
         for id in cities:
-            ct = storage.get("City", id)
+            ct = storage.get(city.City, id)
             if ct:
                 for pl in ct.places:
                     places.append(pl)
 
+    # Generate a list of unique values
     places = list(set(places))
 
     # Check amenities key, do a filter to add into final Place's object List
     if "amenities" in content.keys() and len(content["amenities"]) > 0:
         ame = []
         for id in content["amenities"]:
-            ame.append(storage.get("Amenity", id))
+            ame.append(storage.get(amenity.Amenity, id))
         places = [pl for pl in places if all([a in pl.amenities for a in ame])]
 
     # Remove duplicate amenities
