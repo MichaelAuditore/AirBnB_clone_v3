@@ -26,13 +26,10 @@ def get_cities(state_id):
                  strict_slashes=False)
 def get_city(city_id):
     """ Return a City that matches with the given ID """
-    cities = storage.all(city.City).values()
-    list_cities = [c.to_dict() for c in cities]
-    for one_city in list_cities:
-        if one_city['id'] == city_id:
-            return (jsonify(one_city))
-    abort(404)
-
+    one_city = storage.get(city.City, city_id)
+    if not one_city:
+        abort(404)
+    return (jsonify(one_city.to_dict()))
 
 @app_views.route('/cities/<city_id>', methods=['DELETE'],
                  strict_slashes=False)
