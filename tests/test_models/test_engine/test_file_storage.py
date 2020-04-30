@@ -124,6 +124,7 @@ class TestBmFsInstances(unittest.TestCase):
                     actual = 1
         self.assertTrue(1 == actual)
 
+    @unittest.skipIf(storage_type == 'db', 'skip if environ is db')
     def test_get_method(self):
         """ Test get method in db_storage """
         new_state = State()
@@ -133,6 +134,7 @@ class TestBmFsInstances(unittest.TestCase):
         obj_state = storage.get(State, new_state.id)
         self.assertEqual(obj_state, new_state, "Get method is working.")
 
+    @unittest.skipIf(storage_type == 'db', 'skip if environ is db')
     def test_count_method(self):
         """ Test count method in db_storage """
         states = len(storage.all(State))
