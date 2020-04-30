@@ -7,6 +7,8 @@ from datetime import datetime
 import models
 from models import engine
 from models.engine.file_storage import FileStorage
+from models import storage
+from models.state import State
 import json
 import os
 
@@ -121,6 +123,21 @@ class TestBmFsInstances(unittest.TestCase):
                 if type(v).__name__ == 'BaseModel':
                     actual = 1
         self.assertTrue(1 == actual)
+
+    def test_get_method(self):
+        """ Test get method in db_storage """
+        new_state = State()
+        new_state.name = "Boyaca"
+        storage.new(new_state)
+        storage.save()
+        obj_state = storage.get(State, new_state.id)
+        self.assertEqual(obj_state, new_state, "Get method is working.")
+
+    def test_count_method(self):
+        """ Test count method in db_storage """
+        states = len(storage.all(State))
+        count_state = storage.count(State)
+        self.assertEqual(states, count_state, "Count method is working")
 
 
 class TestUserFsInstances(unittest.TestCase):

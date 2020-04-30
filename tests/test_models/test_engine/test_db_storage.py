@@ -18,6 +18,9 @@ import json
 import os
 import pep8
 import unittest
+from models import storage
+
+
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -86,3 +89,18 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+    def test_get_method(self):
+        """ Test get method in db_storage """
+        new_state = State()
+        new_state.name = "Boyaca"
+        storage.new(new_state)
+        storage.save()
+        obj_state = storage.get(State, new_state.id)
+        self.assertEqual(obj_state, new_state, "Get method is working.")
+
+    def test_count_method(self):
+        """ Test count method in db_storage """
+        states = len(storage.all(State))
+        count_state = storage.count(State)
+        self.assertEqual(states, count_state, "Count method is working")
